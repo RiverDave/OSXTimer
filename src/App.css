@@ -9,6 +9,11 @@ html {
   background-color: black;
 }
 
+body {
+  overflow-y: hidden; /* Hide vertical scrollbar */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
 .timer-content {
   color: white;
   display: flex;

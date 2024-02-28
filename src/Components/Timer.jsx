@@ -4,58 +4,81 @@ import { Num } from "./Num.jsx";
 const DEFAULT_TIME = 10;
 
 export function Timer() {
+  const [values, setValues] = useState([0, 0, 0]); //TODO: according to this state, parse to time units(secs)
   const [seconds, setSeconds] = useState(DEFAULT_TIME);
   const [timer, toggleTimer] = useState(false);
 
-  //Could've used the moment lib tho...
   const formatTime = (time) => {
     const hrs = Math.floor(time / 3600);
     const mins = Math.floor((time % 3600) / 60);
     const secs = time % 60;
-    // [hrs, mins, secs]
-    //   .map((v) => (v < 10 ? "0" + v : v)) // add trailing 0 if element is less than 10 (02, 03 ...)
-    //   .filter((v, i) => v !== "00" || i > 0) // return elements, not equal to 00
-    //   .join(":");
-
     return [hrs, mins, secs];
   };
 
-  const intervalRef = useRef();
-  useEffect(() => {
-    if (timer) {
-      intervalRef.current = setInterval(() => {
-        if (seconds == 0) {
-          clearInterval(intervalRef.current);
-          setSeconds(DEFAULT_TIME);
-          toggleTimer(!timer);
-        } else {
-          setSeconds((prevSeconds) => prevSeconds - 1); // Timer decrease
-        }
-      }, 1000);
+  const handleValueChange = (index, nvalue) => {
+    setValues(values.map((value, i) => (i === index ? nvalue : value)));
+  };
+
+  const [selectedNum, setSelectedNum] = useState(null); //only entity can be selected at once
+
+  const handleKeyDown = (event) => {
+    switch (event.key) {
+      case "ArrowRight":
+        selectedNum === 2 ? setSelectedNum(0) : setSelectedNum(selectedNum + 1);
+        break;
+
+      case "ArrowLeft":
+        selectedNum === 0 ? setSelectedNum(2) : setSelectedNum(selectedNum - 1);
+        break;
     }
+  };
 
-    return () => clearInterval(intervalRef.current);
-  }, [seconds, timer]);
+  // const intervalRef = useRef(); //function reference
+  useEffect(() => {
+    // return () => clearInterval(intervalRef.current);
 
-  const [nhrs, nmins, nsecs] = formatTime(seconds);
-  const calculatedData = [nhrs, nmins, nsecs];
+    window.addEventListener("keydown", handleKeyDown);
 
-  const [selectedNum, setSelectedNum] = useState(null);
+    return () => {
+      //TODO: If timer is toggled, parse state of values in here && translate each pos to (hrs, mins , secs)
 
-  //TODO: Un-toggle selected num if it is already selected
-  // - Change field with keyboard, similar to mac-os/ios timer
+      if (timer) {
+        const [hrs, mins, secs] = values;
+        console.log(`vals : ${hrs} ${mins} ${secs}`);
+      }
+
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedNum, setSelectedNum]);
+
+  // const [nhrs, nmins, nsecs] = formatTime(seconds);
+
+  // console.log(keyboardFocus);
+  console.log(values);
+  console.log(`Selected num : ${selectedNum}`);
+
+  //DONE: Alternate between numbers with the left & right arrow keys [✅] 🐐
+
+  //
   return (
     <main className="timer-content">
       <div className="timer-numbers-space">
-        {[0, 1, 2].map((num) => {
+        {values.map((value, index) => {
           //always return elements in a map!
           return (
             <Num
-              key={num}
-              isSelected={selectedNum === num} //condition depends on current num selected num
-              onClick={() => setSelectedNum(num)}
+              position={index}
+              onValueChange={(newValue) => handleValueChange(index, newValue)}
+              value={value}
+              key={index}
+              isSelected={selectedNum === index} //condition depends on current selected index
+              onClick={() => {
+                selectedNum === index
+                  ? setSelectedNum(null)
+                  : setSelectedNum(index);
+              }}
             >
-              {calculatedData[num]}
+              {values[index]}
             </Num>
           );
         })}
