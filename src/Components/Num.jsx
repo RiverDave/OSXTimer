@@ -1,6 +1,10 @@
 import { useCallback, useEffect } from "react";
 
-//TODO: Implement prop validation since this warning is annoying
+/*NOTE: (The wiki does not recommend doing prop validation in modern react
+ Apparently proper type checking is done in TypeScript. 
+// )
+
+*/
 export function Num({ value, isSelected, onClick, onValueChange, position }) {
   const handleKeyDown = useCallback(
     (event) => {
@@ -26,6 +30,9 @@ export function Num({ value, isSelected, onClick, onValueChange, position }) {
     [isSelected, onValueChange, position, value]
   );
 
+  //small element children:
+  const pos = ["hr", "min", "sec"];
+
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown); //will trigger func upon event
 
@@ -34,9 +41,16 @@ export function Num({ value, isSelected, onClick, onValueChange, position }) {
     };
   }, [isSelected, value, onValueChange, position, handleKeyDown]); //dependencies change will re-render component
 
+  //TODO: Change <small> font
   return (
-    <div onKeyDown={handleKeyDown} onClick={onClick}>
-      <h1 className={`timer-num ${isSelected ? "timer-selected" : ""}`}>
+    <div
+      className="timer-num-space"
+      onKeyDown={handleKeyDown}
+      onClick={onClick}
+    >
+      {/* TODO: Insert a ':' char after each h1, to replicate the ios layout  */}
+      <small className="timer-num-tag">{pos[position]}</small>
+      <h1 className={`timer-num ${isSelected ? "timer-num-selected" : ""}`}>
         {value < 10 ? "0" : " "}
         {value}
       </h1>

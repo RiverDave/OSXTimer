@@ -30,8 +30,6 @@ export function Timer() {
   const intervalRef = useRef(); //function reference
   // setPreservedValues(values); // in case a restart is needed
   useEffect(() => {
-    // return () => clearInterval(intervalRef.current);
-
     setPreservedValues((prevValues) => (!timer ? values : prevValues));
     //preserve values if page is refreshed
     window.localStorage.setItem("values", JSON.stringify(values));
@@ -57,10 +55,6 @@ export function Timer() {
             ? setSelectedNum(2)
             : setSelectedNum((prevSelected) => prevSelected - 1);
           break;
-
-        // case "Enter":
-        //   toggleTimer(!timer);
-        //   break;
       }
     };
 
@@ -108,26 +102,28 @@ export function Timer() {
 
   //DONE: Alternate between numbers with the left & right arrow keys [✅] 🐐
 
-  //TODO: Style timer, based on the ios app, have a modern ui
-  // - [] timer-numbers-space should have a box with a lighter color that denotes the space where the numbers are
-  // - [] There should be an indicative of which time unit denotes what(ie: first position denotes hrs, second mins etc...)
-  // - [] Im still not convinced about the font, perhaps i could find one where the numbers are thinner?
-  // - [] Change the box around selected num, since it is pretty barebones as of now.
-  // - [x] increese te amount of space between the numbers & extras.
-  //BUTTONS:
-  // - [] When timer is not running the space button should be grayed, and when it is on its font should glow
-  // - [] The start button should be highlighted with any sort of color.
-  //WHEN TIMER IS ON:
-  // - [] Add a progress bar animation when timer is toggled?? will have to reasearch a about this
-  //FUTURE TODO:
-  // Add a sound when timer is off
-  //
+  /*(TODO: Style timer, based on the ios app, have a modern ui
+   
+   - [x] timer-numbers-space should have a box with a lighter color that denotes the space where the numbers are
+   - [x] There should be an indicative of which time unit denotes what(ie: first position denotes hrs, second mins etc...)
+   - [x] Im still not convinced about the font, perhaps i could find one where the numbers are thinner?
+   - [x] Change the box around selected num, since it is pretty barebones as of now.
+   - [x] increese te amount of space between the numbers & extras.
+  BUTTONS:
+   - [x] When timer is not running the space button should be grayed, and when it is on its font should glow
+   - [x] The start button should be highlighted with any sort of color.
+  WHEN TIMER IS ON:
+   - [x] Add a progress bar animation when timer is toggled?? will have to reasearch a about this
+  FUTURE TODO:
+   Add a sound when timer is off
+  */
 
   return (
     <main className="timer-content">
-      <div className="timer-numbers-space">
+      <div className="timer-box">
         {values.map((value, index) => {
           //always return elements in a map!
+
           return (
             <Num
               position={index}
@@ -151,15 +147,21 @@ export function Timer() {
           className="btn-cancel"
           tabIndex={0}
           onClick={() => {
-            toggleTimer(!timer);
-            setValues(preservedValues);
+            if (timer) {
+              toggleTimer(false);
+              setValues(preservedValues);
+            }
           }}
+          //TODO: Figure out what to do with the cancel button, since it's not working as it should
+          // rationale: When the timer has started even if it gets paused, when the cancel button is toggled
+          // the timer values should go back to the state as it was before it had been toggled for the first time.
+          // timer -> 10s -> 8s -> pause -> 5s -> cancel -> 10s(back to here)
         >
           Cancel
         </button>
 
         <button
-          className="btn-start"
+          className={!timer ? "btn-start" : "btn-counting"}
           tabIndex={0}
           onClick={() => toggleTimer(!timer)}
         >

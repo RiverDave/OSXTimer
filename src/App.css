@@ -31,29 +31,139 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
-.timer-numbers-space {
+.timer-box {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-bottom: solid 2px rgb(92, 89, 89);
 }
 
+/* space between button & numbers above */
 .timer-extras {
-  margin-top: 30vh;
+  margin-top: 2vh;
   flex-direction: column;
 }
 
-.timer-selected {
-  border: 2px solid white;
+.timer-extras button {
+  margin-top: 30vh;
+  flex-direction: column;
+  margin: 5vh;
 }
 
-.timer-selected:hover {
-  cursor: default;
-  border: 2px solid white;
+/* if timer -> off: */
+/* TODO: Figure out what's going on with its effect, it doesnt match the effect at: https://getcssscan.com/css-buttons-examples (button 88) */
+.btn-start {
+  align-items: center;
+  width: 160px;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 0.7em 1.4em 0.7em 1.1em;
+  color: white;
+  background: #ad5389;
+  background: linear-gradient(
+    0deg,
+    rgba(20, 167, 62, 1) 0%,
+    rgba(102, 247, 113, 1) 100%
+  );
+  border: none;
+  box-shadow: 0 0.7em 1.5em -0.5em #14a73e98;
+  letter-spacing: 0.05em;
+  border-radius: 20em;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
+
+.btn-start:hover {
+  box-shadow: 0 0.5em 1.5em -0.5em #14a73e98;
+}
+
+.btn-start:active {
+  box-shadow: 0 0.3em 1em -0.5em #14a73e98;
+}
+
+/* if timer -> on: */
+/* Could this btn just inherit all traits from above?? 🤔*/
+.btn-counting {
+  align-items: center;
+  width: 160px;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 0.7em 1.4em 0.7em 1.1em;
+  color: white;
+  background: #ad5389;
+  background: linear-gradient(
+    0deg,
+    rgb(167, 108, 20) 0%,
+    rgb(247, 176, 118) 100%
+  );
+  border: none;
+  box-shadow: 0 0.7em 1.5em -0.5em #14a73e98;
+  letter-spacing: 0.05em;
+  border-radius: 20em;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.btn-counting:hover {
+  box-shadow: 0 0.5em 1.5em -0.5em #a77d1498;
+}
+
+.btn-counting:active {
+  box-shadow: 0 0.3em 1em -0.5em #a7741498;
+}
+
+.btn-cancel {
+  align-items: center;
+  width: 160px;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 0.7em 1.4em 0.7em 1.1em;
+  color: white;
+  background: #ad5389;
+  background: linear-gradient(
+    0deg,
+    rgb(108, 104, 99) 0%,
+    rgb(194, 186, 180) 100%
+  );
+  border: none;
+  /* box-shadow: 0 0.7em 1.5em -0.5em #909690fb; */
+  letter-spacing: 0.05em;
+  border-radius: 20em;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.btn-cancel:hover {
+  box-shadow: 0 0.5em 1.5em -0.5em #94928a98;
+}
+
+.btn-cancel:active {
+  box-shadow: 0 0.3em 1em -0.5em #dddbd798;
+}
+/* endif */
 
 .timer-num {
+  margin-top: 10px;
+  cursor: default;
 }
 
 .timer-num:hover {
   cursor: default;
+}
+
+.timer-num-selected {
+  margin-top: 10px;
+  border: 2px solid white;
+}
+
+.timer-num-selected:hover {
+  margin-top: 10px;
+  cursor: default;
+  border: 2px solid white;
 }
