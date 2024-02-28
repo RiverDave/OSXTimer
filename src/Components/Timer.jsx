@@ -1,65 +1,104 @@
 import { useState, useEffect, useRef } from "react";
 import { Num } from "./Num.jsx";
 
-const DEFAULT_TIME = 10;
-
 export function Timer() {
-  const [values, setValues] = useState([0, 0, 0]); //TODO: according to this state, parse to time units(secs)
-  const [seconds, setSeconds] = useState(DEFAULT_TIME);
+  const [values, setValues] = useState([0, 0, 0]);
+  const [seconds, setSeconds] = useState(0);
   const [timer, toggleTimer] = useState(false);
-
-  const formatTime = (time) => {
-    const hrs = Math.floor(time / 3600);
-    const mins = Math.floor((time % 3600) / 60);
-    const secs = time % 60;
-    return [hrs, mins, secs];
-  };
+  const [selectedNum, setSelectedNum] = useState(null); //only entity can be selected at once
 
   const handleValueChange = (index, nvalue) => {
     setValues(values.map((value, i) => (i === index ? nvalue : value)));
   };
 
-  const [selectedNum, setSelectedNum] = useState(null); //only entity can be selected at once
+  //convert secs to array
+  const formatTime = (totalSecs) => {
+    const hrs = Math.floor(totalSecs / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
 
-  const handleKeyDown = (event) => {
-    switch (event.key) {
-      case "ArrowRight":
-        selectedNum === 2 ? setSelectedNum(0) : setSelectedNum(selectedNum + 1);
-        break;
-
-      case "ArrowLeft":
-        selectedNum === 0 ? setSelectedNum(2) : setSelectedNum(selectedNum - 1);
-        break;
-    }
+    return [hrs, mins, secs];
   };
 
-  // const intervalRef = useRef(); //function reference
+  console.log("values: " + values);
+
+  const intervalRef = useRef(); //function reference
   useEffect(() => {
     // return () => clearInterval(intervalRef.current);
 
+    const handleKeyDown = (event) => {
+      if (event.key === "Enter") toggleTimer(!timer);
+      if (timer) return;
+      switch (event.key) {
+        case "ArrowRight":
+          //block below looks ugly, but it fixes the issue of pressing left when null
+          if (selectedNum === null) {
+            setSelectedNum(0);
+            return;
+          }
+          selectedNum >= 2
+            ? setSelectedNum(0)
+            : setSelectedNum((prevSelected) => prevSelected + 1);
+          break;
+
+        case "ArrowLeft":
+          // if (selectedNum === null) setSelectedNum(2);
+          selectedNum <= 0
+            ? setSelectedNum(2)
+            : setSelectedNum((prevSelected) => prevSelected - 1);
+          break;
+
+        // case "Enter":
+        //   toggleTimer(!timer);
+        //   break;
+      }
+    };
+
     window.addEventListener("keydown", handleKeyDown);
 
+    // rationale : ARR -> [parser(passes array of values to seconds)] -> ARR
+
+    //converts array to seconds
+    const parseTime = () => {
+      const [hrs, mins, secs] = values;
+      const minsTosecs = Math.floor(mins * 60);
+      const hrsToSecs = Math.floor(hrs * 60 * 60);
+      return secs + minsTosecs + hrsToSecs;
+    };
+
+    if (timer) {
+      setSelectedNum(null); //freezes any type of user input
+      const [nhrs, nmins, nsecs] = formatTime(seconds);
+      // const calculatedData = [nhrs, nmins, nsecs]; //pass to component only if timer was toggled
+      setValues[(nhrs, nmins, nsecs)];
+      const totalSeconds = parseTime();
+      setSeconds(totalSeconds);
+
+      intervalRef.current = setInterval(() => {
+        setSeconds((prevSeconds) => {
+          if (prevSeconds <= 0) {
+            console.log("timer went off");
+            clearInterval(intervalRef.current);
+            toggleTimer(!timer);
+            return 0;
+          } else {
+            setValues(formatTime(prevSeconds - 1));
+            return prevSeconds - 1;
+          }
+        });
+      }, 1000);
+    }
+
     return () => {
-      //TODO: If timer is toggled, parse state of values in here && translate each pos to (hrs, mins , secs)
-
-      if (timer) {
-        const [hrs, mins, secs] = values;
-        console.log(`vals : ${hrs} ${mins} ${secs}`);
-      }
-
+      clearInterval(intervalRef.current);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedNum, setSelectedNum]);
+  }, [seconds, timer, selectedNum, values]);
 
-  // const [nhrs, nmins, nsecs] = formatTime(seconds);
-
-  // console.log(keyboardFocus);
-  console.log(values);
-  console.log(`Selected num : ${selectedNum}`);
-
+  console.log(selectedNum);
   //DONE: Alternate between numbers with the left & right arrow keys [✅] 🐐
 
-  //
+  //TODO: Style timer, based on ios app
   return (
     <main className="timer-content">
       <div className="timer-numbers-space">
@@ -84,7 +123,9 @@ export function Timer() {
         })}
       </div>
       <div className="timer-extras">
-        <button onClick={() => toggleTimer(!timer)}>Start</button>
+        <button onClick={() => toggleTimer(!timer)}>
+          {timer ? "Stop" : "Start"}
+        </button>
       </div>
     </main>
   );
