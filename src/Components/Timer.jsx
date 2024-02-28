@@ -2,10 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import { Num } from "./Num.jsx";
 
 export function Timer() {
-  const [values, setValues] = useState([0, 0, 0]);
+  const [values, setValues] = useState(() => {
+    const valuesFromStorage = window.localStorage.getItem("values");
+    return valuesFromStorage ? JSON.parse(valuesFromStorage) : Array(3).fill(0);
+  });
+
   const [seconds, setSeconds] = useState(0);
   const [timer, toggleTimer] = useState(false);
   const [selectedNum, setSelectedNum] = useState(null); //only entity can be selected at once
+  const [preservedValues, setPreservedValues] = useState(Array(3).fill(0));
 
   const handleValueChange = (index, nvalue) => {
     setValues(values.map((value, i) => (i === index ? nvalue : value)));
@@ -23,8 +28,13 @@ export function Timer() {
   console.log("values: " + values);
 
   const intervalRef = useRef(); //function reference
+  // setPreservedValues(values); // in case a restart is needed
   useEffect(() => {
     // return () => clearInterval(intervalRef.current);
+
+    setPreservedValues((prevValues) => (!timer ? values : prevValues));
+    //preserve values if page is refreshed
+    window.localStorage.setItem("values", JSON.stringify(values));
 
     const handleKeyDown = (event) => {
       if (event.key === "Enter") toggleTimer(!timer);
@@ -68,8 +78,8 @@ export function Timer() {
 
     if (timer) {
       setSelectedNum(null); //freezes any type of user input
+
       const [nhrs, nmins, nsecs] = formatTime(seconds);
-      // const calculatedData = [nhrs, nmins, nsecs]; //pass to component only if timer was toggled
       setValues[(nhrs, nmins, nsecs)];
       const totalSeconds = parseTime();
       setSeconds(totalSeconds);
@@ -92,13 +102,27 @@ export function Timer() {
     return () => {
       clearInterval(intervalRef.current);
       window.removeEventListener("keydown", handleKeyDown);
+      window.localStorage.removeItem("values");
     };
   }, [seconds, timer, selectedNum, values]);
 
-  console.log(selectedNum);
   //DONE: Alternate between numbers with the left & right arrow keys [✅] 🐐
 
-  //TODO: Style timer, based on ios app
+  //TODO: Style timer, based on the ios app, have a modern ui
+  // - [] timer-numbers-space should have a box with a lighter color that denotes the space where the numbers are
+  // - [] There should be an indicative of which time unit denotes what(ie: first position denotes hrs, second mins etc...)
+  // - [] Im still not convinced about the font, perhaps i could find one where the numbers are thinner?
+  // - [] Change the box around selected num, since it is pretty barebones as of now.
+  // - [x] increese te amount of space between the numbers & extras.
+  //BUTTONS:
+  // - [] When timer is not running the space button should be grayed, and when it is on its font should glow
+  // - [] The start button should be highlighted with any sort of color.
+  //WHEN TIMER IS ON:
+  // - [] Add a progress bar animation when timer is toggled?? will have to reasearch a about this
+  //FUTURE TODO:
+  // Add a sound when timer is off
+  //
+
   return (
     <main className="timer-content">
       <div className="timer-numbers-space">
@@ -123,9 +147,26 @@ export function Timer() {
         })}
       </div>
       <div className="timer-extras">
-        <button onClick={() => toggleTimer(!timer)}>
-          {timer ? "Stop" : "Start"}
+        <button
+          className="btn-cancel"
+          tabIndex={0}
+          onClick={() => {
+            toggleTimer(!timer);
+            setValues(preservedValues);
+          }}
+        >
+          Cancel
         </button>
+
+        <button
+          className="btn-start"
+          tabIndex={0}
+          onClick={() => toggleTimer(!timer)}
+        >
+          {timer ? "Pause" : "Start"}
+        </button>
+
+        {/* <button tabIndex={0}>restart</button> */}
       </div>
     </main>
   );

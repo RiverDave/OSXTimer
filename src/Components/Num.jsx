@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 
-//TODO: Understand deeply the onValueChange prop
+//TODO: Implement prop validation since this warning is annoying
 export function Num({ value, isSelected, onClick, onValueChange, position }) {
   const handleKeyDown = useCallback(
     (event) => {
@@ -35,12 +35,8 @@ export function Num({ value, isSelected, onClick, onValueChange, position }) {
   }, [isSelected, value, onValueChange, position, handleKeyDown]); //dependencies change will re-render component
 
   return (
-    <div
-      onKeyDown={handleKeyDown}
-      onClick={onClick}
-      className={`timer-num ${isSelected ? "timer-selected" : ""}`}
-    >
-      <h1>
+    <div onKeyDown={handleKeyDown} onClick={onClick}>
+      <h1 className={`timer-num ${isSelected ? "timer-selected" : ""}`}>
         {value < 10 ? "0" : " "}
         {value}
       </h1>
