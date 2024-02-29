@@ -5,24 +5,25 @@
 */
 import { useState, useEffect, useRef } from "react";
 import { Num } from "./Num.jsx";
+// import  Alarm  from "./assets/mixkit-alarm-tone.wav"
+import { playAlarm } from "../sound/sounds.js";
 
 export function Timer() {
-  const [startedCountdown, setStartedCountdown] = useState(() => {
-    const valuesFromStorage = window.localStorage.getItem("startedCountdown");
-    return valuesFromStorage ? JSON.parse(valuesFromStorage) : null;
-  });
+  //conditional states
+  const [startedCountdown, setStartedCountdown] = useState(false);
+  const [timer, toggleTimer] = useState(false);
+  const [timerOff, setTimerOff] = useState(false);
 
+  //value states
   const [values, setValues] = useState(() => {
     const valuesFromStorage = window.localStorage.getItem("values");
     return valuesFromStorage && startedCountdown
       ? JSON.parse(valuesFromStorage)
-      : Array(3).fill(0);
+      : Array(3).fill(0); //will trigger this for now...
   });
-
-  const [seconds, setSeconds] = useState(0);
-  const [timer, toggleTimer] = useState(false);
-  const [selectedNum, setSelectedNum] = useState(null); //only entity can be selected at once
   const [preservedValues, setPreservedValues] = useState(Array(3).fill(0)); //copy of values, used to restore timer if cancel button is toggled
+  const [seconds, setSeconds] = useState(0);
+  const [selectedNum, setSelectedNum] = useState(null); //only entity can be selected at once
 
   //Still need to figure out what this does...
   const handleValueChange = (index, nvalue) => {
@@ -39,16 +40,33 @@ export function Timer() {
   };
 
   const intervalRef = useRef(); //function reference
-  console.log(window.localStorage);
+
+  const handleStartButtonChild = () => {
+    if (timerOff) {
+      return "Stop";
+    }
+
+    if (startedCountdown && timer) {
+      return "Pause";
+    } else if (startedCountdown && !timer) {
+      return "Resume";
+    } else {
+      return "Start";
+    }
+  };
+
+  const handleCancelButtonClass = () => {
+    if (timerOff) {
+      return "btn-cancel-off";
+    }
+
+    return timer || startedCountdown ? "btn-cancel" : "btn-cancel-off";
+  };
   useEffect(() => {
     //preserve values if page is refreshed
     if (!startedCountdown) {
-      //this was causing an issue before...
       setPreservedValues((prevValues) => (!timer ? values : prevValues)); // -[✅?]
       window.localStorage.setItem("values", JSON.stringify(values));
-      // window.localStorage.setItem(
-      //   "startedCountdown",
-      //   JSON.stringify(startedCountdown)
     }
 
     const handleKeyDown = (event) => {
@@ -101,9 +119,19 @@ export function Timer() {
       setSeconds(totalSeconds);
 
       intervalRef.current = setInterval(() => {
+        //Timer goes off logic:
         setSeconds((prevSeconds) => {
           if (prevSeconds <= 0) {
-            console.log("timer went off");
+            setTimerOff(true);
+
+            //alarm, waits for user input to go off(or ...)
+            if (!timerOff) {
+              //TODO:play sound in here!!
+              playAlarm();
+              console.log("timer went off");
+              return 0;
+            }
+
             setStartedCountdown(false);
             clearInterval(intervalRef.current);
             toggleTimer(!timer);
@@ -126,10 +154,14 @@ export function Timer() {
   //DONE: Alternate between numbers with the left & right arrow keys [✅] 🐐
 
   /*(TODO: Style timer, based on the ios app, have a modern ui
-   
    - [x] Add a progress bar animation when timer is toggled?? will have to reasearch a about this
+   -[x] Add a sound when timer is off
+   -[x] For some reason the timer-box div is changing its width everytime a number changes, i might have
+   to make this div static or less responsive.
+
+
   TODO:
-   Add a sound when timer is off
+   - [x] Add a progress bar animation when timer is toggled?? will have to reasearch a about this
   */
 
   return (
@@ -158,14 +190,13 @@ export function Timer() {
       </div>
       <div className="timer-extras">
         <button
-          className={
-            timer || startedCountdown ? "btn-cancel" : "btn-cancel-off"
-          }
+          className={handleCancelButtonClass()}
           tabIndex={-1}
           onClick={() => {
             if (startedCountdown) {
-              toggleTimer(false);
-              setStartedCountdown(false);
+              //this button shouldn't work when !timer && !startedCountdown
+              toggleTimer(!timer);
+              setStartedCountdown(!startedCountdown);
               setValues(preservedValues); //should go back to values pre-started countdown(localStorage?)
             }
           }}
@@ -175,14 +206,21 @@ export function Timer() {
 
         <button
           className={!timer ? "btn-start" : "btn-counting"}
-          onClick={() => toggleTimer(!timer)}
+          onClick={() => {
+            //basically if stop is hit after timer ends
+            if (timerOff) {
+              setTimerOff(!timerOff);
+              toggleTimer(!timer);
+              setStartedCountdown(!startedCountdown);
+              setValues(preservedValues); //should go back to values pre-started countdown(localStorage?)
+            } else {
+              //if stop is hit before timer ends
+              toggleTimer(!timer);
+            }
+          }}
           tabIndex={-1}
         >
-          {startedCountdown && timer
-            ? "Pause"
-            : startedCountdown && !timer
-              ? "Resume"
-              : "Start"}
+          {handleStartButtonChild()}
         </button>
 
         {/* <button tabIndex={0}>restart</button> */}

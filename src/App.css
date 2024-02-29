@@ -65,7 +65,6 @@ body {
 }
 
 /* if timer -> off: */
-/* TODO: Figure out what's going on with its effect, it doesnt match the effect at: https://getcssscan.com/css-buttons-examples (button 88) */
 .btn-start {
   align-items: center;
   width: 160px;
@@ -119,11 +118,11 @@ body {
 }
 
 .btn-counting:hover {
-  box-shadow: 0 0.5em 1.5em -0.5em #14a73e98;
+  box-shadow: 0 0.5em 1.5em -0.5em #a7781498;
 }
 
 .btn-counting:active {
-  box-shadow: 0 0.3em 1em -0.5em #14a73e98;
+  box-shadow: 0 0.3em 1em -0.5em #a7711498;
 }
 
 /* left hand of start */
@@ -182,10 +181,7 @@ body {
   touch-action: manipulation;
 }
 
-/* .btn-cancel-off:hover {
-  box-shadow: 0 0.5em 1.5em -0.5em #ffffff98;
+/* toggled when timer goes off */
+.btn-invisible {
+  display: none;
 }
-
-.btn-cancel-off:active {
-  box-shadow: 0 0.3em 1em -0.5em #ffffff98;
-} */

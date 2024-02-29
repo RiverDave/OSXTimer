@@ -12,6 +12,7 @@ small {
 }
 
 .timer-num {
+  width: 12vh;
   margin-top: 10px;
   cursor: default;
 }
