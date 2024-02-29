@@ -1,8 +1,3 @@
-/* TODO: to be shippable i need that:
-  - It creates a sound when it is toggled
-  - The cancel button is fixed
-
-*/
 import { useState, useEffect, useRef } from "react";
 import { Num } from "./Num.jsx";
 // import  Alarm  from "./assets/mixkit-alarm-tone.wav"
@@ -126,7 +121,6 @@ export function Timer() {
 
             //alarm, waits for user input to go off(or ...)
             if (!timerOff) {
-              //TODO:play sound in here!!
               playAlarm();
               console.log("timer went off");
               return 0;
@@ -149,18 +143,12 @@ export function Timer() {
       window.removeEventListener("keydown", handleKeyDown);
       window.localStorage.removeItem("values");
     };
+    //FIXME: Fix dependency warning
   }, [seconds, timer, selectedNum, values, startedCountdown]);
 
   //DONE: Alternate between numbers with the left & right arrow keys [✅] 🐐
 
-  /*(TODO: Style timer, based on the ios app, have a modern ui
-   - [x] Add a progress bar animation when timer is toggled?? will have to reasearch a about this
-   -[x] Add a sound when timer is off
-   -[x] For some reason the timer-box div is changing its width everytime a number changes, i might have
-   to make this div static or less responsive.
-
-
-  TODO:
+  /*(TODO: Style timer, based on the osx app, have a modern ui
    - [x] Add a progress bar animation when timer is toggled?? will have to reasearch a about this
   */
 
@@ -193,12 +181,10 @@ export function Timer() {
           className={handleCancelButtonClass()}
           tabIndex={-1}
           onClick={() => {
-            if (startedCountdown) {
-              //this button shouldn't work when !timer && !startedCountdown
-              toggleTimer(!timer);
-              setStartedCountdown(!startedCountdown);
-              setValues(preservedValues); //should go back to values pre-started countdown(localStorage?)
-            }
+            //this button shouldn't work when !timer && !startedCountdown
+            toggleTimer(false);
+            setStartedCountdown(false);
+            setValues(preservedValues); //should go back to values pre-started countdown(localStorage?)
           }}
         >
           Cancel
