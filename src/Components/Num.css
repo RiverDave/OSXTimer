@@ -1,5 +1,31 @@
 /* TODO: Arrange css attributes in its respective css file */
+.num-space {
+  margin-top: 35px;
+}
 
-.timer-num-tag {
-  margin-bottom: 10px;
+small {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-family: "Roboto", sans-serif;
+  color: rgb(180, 180, 180);
+}
+
+.timer-num {
+  margin-top: 10px;
+  cursor: default;
+}
+
+.timer-num:hover {
+  cursor: default;
+}
+
+.timer-num-selected {
+  margin-top: 10px;
+  /* border: 2px solid white; */
+  background-color: rgb(192, 127, 5);
+}
+
+.timer-num-selected:hover {
+  cursor: default;
 }

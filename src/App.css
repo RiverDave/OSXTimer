@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@250;400&display=swap");
 
 #root {
   max-width: 1280px;
@@ -28,15 +28,29 @@ body {
 .timer-content h1 {
   font-size: 10vh;
   padding: 10px;
-  font-family: "Roboto", sans-serif;
+  font-family: "Inter", sans-serif;
+  font-weight: 250;
 }
 
 .timer-box {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: solid 2px rgb(92, 89, 89);
+  /* border-bottom: solid 2px rgb(92, 89, 89); */
+  border: solid 2px rgb(60, 57, 57);
+  border-radius: 4px;
+  background-color: rgb(41, 38, 38);
+  height: 15vh;
 }
+
+/* .timer-box::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-bottom: solid 2px rgb(136, 131, 131);
+} */
 
 /* space between button & numbers above */
 .timer-extras {
@@ -47,7 +61,7 @@ body {
 .timer-extras button {
   margin-top: 30vh;
   flex-direction: column;
-  margin: 5vh;
+  margin: 2vh;
 }
 
 /* if timer -> off: */
@@ -58,17 +72,13 @@ body {
   font-weight: 500;
   font-size: 16px;
   padding: 0.7em 1.4em 0.7em 1.1em;
-  color: white;
+  color: rgb(255, 255, 255);
   background: #ad5389;
-  background: linear-gradient(
-    0deg,
-    rgba(20, 167, 62, 1) 0%,
-    rgba(102, 247, 113, 1) 100%
-  );
+  background: linear-gradient(0deg, rgb(20, 167, 61) 0%, rgb(19, 158, 31) 100%);
   border: none;
   box-shadow: 0 0.7em 1.5em -0.5em #14a73e98;
   letter-spacing: 0.05em;
-  border-radius: 20em;
+  border-radius: 6px;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -91,17 +101,17 @@ body {
   font-weight: 500;
   font-size: 16px;
   padding: 0.7em 1.4em 0.7em 1.1em;
-  color: white;
+  color: rgb(255, 255, 255);
   background: #ad5389;
   background: linear-gradient(
     0deg,
-    rgb(167, 108, 20) 0%,
-    rgb(247, 176, 118) 100%
+    rgb(167, 111, 20) 0%,
+    rgb(158, 107, 19) 100%
   );
   border: none;
-  box-shadow: 0 0.7em 1.5em -0.5em #14a73e98;
+  box-shadow: 0 0.7em 1.5em -0.5em #a7801498;
   letter-spacing: 0.05em;
-  border-radius: 20em;
+  border-radius: 6px;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -109,30 +119,31 @@ body {
 }
 
 .btn-counting:hover {
-  box-shadow: 0 0.5em 1.5em -0.5em #a77d1498;
+  box-shadow: 0 0.5em 1.5em -0.5em #14a73e98;
 }
 
 .btn-counting:active {
-  box-shadow: 0 0.3em 1em -0.5em #a7741498;
+  box-shadow: 0 0.3em 1em -0.5em #14a73e98;
 }
 
+/* left hand of start */
 .btn-cancel {
   align-items: center;
   width: 160px;
   font-weight: 500;
   font-size: 16px;
   padding: 0.7em 1.4em 0.7em 1.1em;
-  color: white;
+  color: rgb(255, 255, 255);
   background: #ad5389;
   background: linear-gradient(
     0deg,
-    rgb(108, 104, 99) 0%,
-    rgb(194, 186, 180) 100%
+    rgb(174, 174, 174) 0%,
+    rgba(186, 176, 176, 0.708) 100%
   );
   border: none;
-  /* box-shadow: 0 0.7em 1.5em -0.5em #909690fb; */
+  box-shadow: 0 0.7em 1.5em -0.5em #ffffff98;
   letter-spacing: 0.05em;
-  border-radius: 20em;
+  border-radius: 6px;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -140,30 +151,41 @@ body {
 }
 
 .btn-cancel:hover {
-  box-shadow: 0 0.5em 1.5em -0.5em #94928a98;
+  box-shadow: 0 0.5em 1.5em -0.5em #ffffff98;
 }
 
 .btn-cancel:active {
-  box-shadow: 0 0.3em 1em -0.5em #dddbd798;
+  box-shadow: 0 0.3em 1em -0.5em #ffffff98;
 }
 /* endif */
 
-.timer-num {
-  margin-top: 10px;
-  cursor: default;
+.btn-cancel-off {
+  align-items: center;
+  width: 160px;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 0.7em 1.4em 0.7em 1.1em;
+  color: rgba(255, 255, 255, 0.137);
+  background: #ad5389;
+  background: linear-gradient(
+    0deg,
+    rgba(174, 174, 174, 0.473) 0%,
+    rgba(186, 176, 176, 0.473) 100%
+  );
+  border: none;
+  /* box-shadow: 0 0.7em 1.5em -0.5em #ffffff98; */
+  letter-spacing: 0.05em;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
 
-.timer-num:hover {
-  cursor: default;
+/* .btn-cancel-off:hover {
+  box-shadow: 0 0.5em 1.5em -0.5em #ffffff98;
 }
 
-.timer-num-selected {
-  margin-top: 10px;
-  border: 2px solid white;
-}
-
-.timer-num-selected:hover {
-  margin-top: 10px;
-  cursor: default;
-  border: 2px solid white;
-}
+.btn-cancel-off:active {
+  box-shadow: 0 0.3em 1em -0.5em #ffffff98;
+} */

@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from "react";
+import "./Num.css";
 
 /*NOTE: (The wiki does not recommend doing prop validation in modern react
  Apparently proper type checking is done in TypeScript. 
@@ -41,14 +42,9 @@ export function Num({ value, isSelected, onClick, onValueChange, position }) {
     };
   }, [isSelected, value, onValueChange, position, handleKeyDown]); //dependencies change will re-render component
 
-  //TODO: Change <small> font
   return (
-    <div
-      className="timer-num-space"
-      onKeyDown={handleKeyDown}
-      onClick={onClick}
-    >
-      {/* TODO: Insert a ':' char after each h1, to replicate the ios layout  */}
+    <div className="num-space" onKeyDown={handleKeyDown} onClick={onClick}>
+      {/* TODO: Insert a ':' char after each h1, to replicate the ios layout: will figure out in the future  */}
       <small className="timer-num-tag">{pos[position]}</small>
       <h1 className={`timer-num ${isSelected ? "timer-num-selected" : ""}`}>
         {value < 10 ? "0" : " "}

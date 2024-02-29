@@ -1,17 +1,30 @@
+/* TODO: to be shippable i need that:
+  - It creates a sound when it is toggled
+  - The cancel button is fixed
+
+*/
 import { useState, useEffect, useRef } from "react";
 import { Num } from "./Num.jsx";
 
 export function Timer() {
+  const [startedCountdown, setStartedCountdown] = useState(() => {
+    const valuesFromStorage = window.localStorage.getItem("startedCountdown");
+    return valuesFromStorage ? JSON.parse(valuesFromStorage) : null;
+  });
+
   const [values, setValues] = useState(() => {
     const valuesFromStorage = window.localStorage.getItem("values");
-    return valuesFromStorage ? JSON.parse(valuesFromStorage) : Array(3).fill(0);
+    return valuesFromStorage && startedCountdown
+      ? JSON.parse(valuesFromStorage)
+      : Array(3).fill(0);
   });
 
   const [seconds, setSeconds] = useState(0);
   const [timer, toggleTimer] = useState(false);
   const [selectedNum, setSelectedNum] = useState(null); //only entity can be selected at once
-  const [preservedValues, setPreservedValues] = useState(Array(3).fill(0));
+  const [preservedValues, setPreservedValues] = useState(Array(3).fill(0)); //copy of values, used to restore timer if cancel button is toggled
 
+  //Still need to figure out what this does...
   const handleValueChange = (index, nvalue) => {
     setValues(values.map((value, i) => (i === index ? nvalue : value)));
   };
@@ -25,14 +38,18 @@ export function Timer() {
     return [hrs, mins, secs];
   };
 
-  console.log("values: " + values);
-
   const intervalRef = useRef(); //function reference
-  // setPreservedValues(values); // in case a restart is needed
+  console.log(window.localStorage);
   useEffect(() => {
-    setPreservedValues((prevValues) => (!timer ? values : prevValues));
     //preserve values if page is refreshed
-    window.localStorage.setItem("values", JSON.stringify(values));
+    if (!startedCountdown) {
+      //this was causing an issue before...
+      setPreservedValues((prevValues) => (!timer ? values : prevValues)); // -[✅?]
+      window.localStorage.setItem("values", JSON.stringify(values));
+      // window.localStorage.setItem(
+      //   "startedCountdown",
+      //   JSON.stringify(startedCountdown)
+    }
 
     const handleKeyDown = (event) => {
       if (event.key === "Enter") toggleTimer(!timer);
@@ -55,6 +72,10 @@ export function Timer() {
             ? setSelectedNum(2)
             : setSelectedNum((prevSelected) => prevSelected - 1);
           break;
+
+        case "Escape":
+          setSelectedNum(null);
+          break;
       }
     };
 
@@ -71,6 +92,7 @@ export function Timer() {
     };
 
     if (timer) {
+      setStartedCountdown(true);
       setSelectedNum(null); //freezes any type of user input
 
       const [nhrs, nmins, nsecs] = formatTime(seconds);
@@ -82,6 +104,7 @@ export function Timer() {
         setSeconds((prevSeconds) => {
           if (prevSeconds <= 0) {
             console.log("timer went off");
+            setStartedCountdown(false);
             clearInterval(intervalRef.current);
             toggleTimer(!timer);
             return 0;
@@ -98,23 +121,14 @@ export function Timer() {
       window.removeEventListener("keydown", handleKeyDown);
       window.localStorage.removeItem("values");
     };
-  }, [seconds, timer, selectedNum, values]);
+  }, [seconds, timer, selectedNum, values, startedCountdown]);
 
   //DONE: Alternate between numbers with the left & right arrow keys [✅] 🐐
 
   /*(TODO: Style timer, based on the ios app, have a modern ui
    
-   - [x] timer-numbers-space should have a box with a lighter color that denotes the space where the numbers are
-   - [x] There should be an indicative of which time unit denotes what(ie: first position denotes hrs, second mins etc...)
-   - [x] Im still not convinced about the font, perhaps i could find one where the numbers are thinner?
-   - [x] Change the box around selected num, since it is pretty barebones as of now.
-   - [x] increese te amount of space between the numbers & extras.
-  BUTTONS:
-   - [x] When timer is not running the space button should be grayed, and when it is on its font should glow
-   - [x] The start button should be highlighted with any sort of color.
-  WHEN TIMER IS ON:
    - [x] Add a progress bar animation when timer is toggled?? will have to reasearch a about this
-  FUTURE TODO:
+  TODO:
    Add a sound when timer is off
   */
 
@@ -144,28 +158,31 @@ export function Timer() {
       </div>
       <div className="timer-extras">
         <button
-          className="btn-cancel"
-          tabIndex={0}
+          className={
+            timer || startedCountdown ? "btn-cancel" : "btn-cancel-off"
+          }
+          tabIndex={-1}
           onClick={() => {
-            if (timer) {
+            if (startedCountdown) {
               toggleTimer(false);
-              setValues(preservedValues);
+              setStartedCountdown(false);
+              setValues(preservedValues); //should go back to values pre-started countdown(localStorage?)
             }
           }}
-          //TODO: Figure out what to do with the cancel button, since it's not working as it should
-          // rationale: When the timer has started even if it gets paused, when the cancel button is toggled
-          // the timer values should go back to the state as it was before it had been toggled for the first time.
-          // timer -> 10s -> 8s -> pause -> 5s -> cancel -> 10s(back to here)
         >
           Cancel
         </button>
 
         <button
           className={!timer ? "btn-start" : "btn-counting"}
-          tabIndex={0}
           onClick={() => toggleTimer(!timer)}
+          tabIndex={-1}
         >
-          {timer ? "Pause" : "Start"}
+          {startedCountdown && timer
+            ? "Pause"
+            : startedCountdown && !timer
+              ? "Resume"
+              : "Start"}
         </button>
 
         {/* <button tabIndex={0}>restart</button> */}
